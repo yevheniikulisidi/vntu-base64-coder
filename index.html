@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-orange-100 flex items-center justify-center h-screen">
-    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <div class="bg-white shadow-lg rounded-lg p-8 md:w-full max-w-md">
       <h1 class="text-3xl font-bold mb-6 text-center text-slate-900">
         Кодер/Декодер Base64
       </h1>
@@ -39,6 +39,9 @@
         placeholder="Результат з'явиться тут..."
         readonly
       ></textarea>
+      <p id="helpText" class="text-sm text-slate-500 mt-2 text-center hidden">
+        Натисніть на текст, щоб скопіювати
+      </p>
     </div>
   </body>
 </html>

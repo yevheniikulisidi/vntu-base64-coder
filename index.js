@@ -21,6 +21,7 @@ class App {
     this.coder = coder;
     this.inputTextElement = document.getElementById('inputText');
     this.outputTextElement = document.getElementById('outputText');
+    this.helpTextElement = document.getElementById('helpText');
     this.init();
   }
 
@@ -39,6 +40,7 @@ class App {
   updateOutput(action) {
     const inputText = this.inputTextElement.value;
     this.outputTextElement.value = this.coder.process(action, inputText);
+    this.helpTextElement.classList.remove('hidden');
   }
 
   async copyToClipboard() {
