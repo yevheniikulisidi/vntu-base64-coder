@@ -16,32 +16,44 @@ class Base64Coder {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const coder = new Base64Coder();
+class App {
+  constructor(coder) {
+    this.coder = coder;
+    this.inputTextElement = document.getElementById('inputText');
+    this.outputTextElement = document.getElementById('outputText');
+    this.init();
+  }
 
-  const inputTextElement = document.getElementById('inputText');
-  const outputTextElement = document.getElementById('outputText');
+  init() {
+    document
+      .getElementById('encodeButton')
+      .addEventListener('click', () => this.updateOutput('encode'));
+    document
+      .getElementById('decodeButton')
+      .addEventListener('click', () => this.updateOutput('decode'));
+    this.outputTextElement.addEventListener('click', () =>
+      this.copyToClipboard(),
+    );
+  }
 
-  const updateOutput = (action) => {
-    const inputText = inputTextElement.value;
-    outputTextElement.value = coder.process(action, inputText);
-  };
+  updateOutput(action) {
+    const inputText = this.inputTextElement.value;
+    this.outputTextElement.value = this.coder.process(action, inputText);
+  }
 
-  document
-    .getElementById('encodeButton')
-    .addEventListener('click', () => updateOutput('encode'));
-  document
-    .getElementById('decodeButton')
-    .addEventListener('click', () => updateOutput('decode'));
-
-  outputTextElement.addEventListener('click', async () => {
-    if (outputTextElement.value) {
+  async copyToClipboard() {
+    if (this.outputTextElement.value) {
       try {
-        await navigator.clipboard.writeText(outputTextElement.value);
+        await navigator.clipboard.writeText(this.outputTextElement.value);
         alert('Результат скопійовано в буфер обміну!');
       } catch (err) {
         console.error('Не вдалося скопіювати результат: ', err);
       }
     }
-  });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const coder = new Base64Coder();
+  new App(coder);
 });
