@@ -7,7 +7,7 @@ class Base64Coder {
     try {
       return decodeURIComponent(atob(base64));
     } catch {
-      return 'Невірний формат Base64';
+      return null;
     }
   }
 
@@ -21,8 +21,8 @@ class App {
     this.coder = coder;
     this.inputTextElement = document.getElementById('inputText');
     this.outputTextElement = document.getElementById('outputText');
-    this.helpTextElement = document.getElementById('helpText');
     this.inputCharCountElement = document.getElementById('inputCharCount');
+    this.copyButtonElement = document.getElementById('copyButton');
     this.init();
   }
 
@@ -36,7 +36,7 @@ class App {
     document
       .getElementById('clearButton')
       .addEventListener('click', () => this.clearText());
-    this.outputTextElement.addEventListener('click', () =>
+    this.copyButtonElement.addEventListener('click', () =>
       this.copyToClipboard(),
     );
     this.inputTextElement.addEventListener('input', () =>
@@ -47,19 +47,15 @@ class App {
   updateOutput(action) {
     const inputText = this.inputTextElement.value;
     const result = this.coder.process(action, inputText);
-    this.outputTextElement.value = result;
-    this.updateCharCount();
 
-    if (inputText.trim() === '' || result === 'Невірний формат Base64') {
-      this.helpTextElement.classList.add('hidden');
+    if (result === null) {
+      this.showMessage('Невірний формат Base64', 'error');
+      this.outputTextElement.value = '';
     } else {
-      this.helpTextElement.classList.remove('hidden');
+      this.outputTextElement.value = result;
     }
 
-    this.outputTextElement.classList.toggle(
-      'text-red-500',
-      result === 'Невірний формат Base64',
-    );
+    this.updateCharCount();
   }
 
   updateCharCount() {
@@ -69,37 +65,58 @@ class App {
   clearText() {
     this.inputTextElement.value = '';
     this.outputTextElement.value = '';
-    this.helpTextElement.classList.add('hidden');
     this.updateCharCount();
   }
 
   async copyToClipboard() {
-    if (
-      this.outputTextElement.value &&
-      this.outputTextElement.value !== 'Невірний формат Base64'
-    ) {
+    if (this.outputTextElement.value) {
       try {
-        await navigator.clipboard.writeText(this.outputTextElement.value);
-        this.showCopyConfirmation();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(this.outputTextElement.value);
+        } else {
+          this.fallbackCopyTextToClipboard(this.outputTextElement.value);
+        }
+        this.showMessage('Результат скопійовано в буфер обміну!', 'success');
       } catch (err) {
-        console.error('Не вдалося скопіювати результат: ', err);
+        console.error('Не вдалося скопіювати текст у буфер обміну', err);
       }
     }
   }
 
-  showCopyConfirmation() {
-    const confirmation = document.createElement('div');
-    confirmation.textContent = 'Результат скопійовано в буфер обміну!';
-    confirmation.className =
-      'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-[#8EFE99] text-gray-950 py-2 px-4 rounded shadow-lg opacity-0 transition-opacity duration-500 ease-in-out text-sm md:text-base';
-    document.body.appendChild(confirmation);
-    void confirmation.offsetWidth;
-    confirmation.classList.add('opacity-100');
+  fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('Fallback: Не вдалося скопіювати результат: ', err);
+    }
+    document.body.removeChild(textArea);
+  }
+
+  showMessage(message, type) {
+    const div = document.createElement('div');
+    div.textContent = message;
+    div.className =
+      'fixed bottom-5 left-1/2 transform -translate-x-1/2 py-2 px-4 rounded shadow-lg opacity-0 transition-opacity duration-500 ease-in-out text-sm md:text-base text-center';
+    if (type === 'success') {
+      div.classList.add('bg-[#8EFE99]', 'text-gray-950');
+    } else if (type === 'error') {
+      div.classList.add('bg-[#FF6B6B]', 'text-white');
+    }
+    document.body.appendChild(div);
+    void div.offsetWidth;
+    div.classList.add('opacity-100');
     setTimeout(() => {
-      confirmation.classList.remove('opacity-100');
-      confirmation.classList.add('opacity-0');
+      div.classList.remove('opacity-100');
+      div.classList.add('opacity-0');
       setTimeout(() => {
-        document.body.removeChild(confirmation);
+        document.body.removeChild(div);
       }, 500);
     }, 2000);
   }
@@ -107,5 +124,6 @@ class App {
 
 document.addEventListener('DOMContentLoaded', () => {
   const coder = new Base64Coder();
-  new App(coder);
+  const app = new App(coder);
+  app.init();
 });
