@@ -91,7 +91,7 @@ class App {
     const confirmation = document.createElement('div');
     confirmation.textContent = 'Результат скопійовано в буфер обміну!';
     confirmation.className =
-      'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-[#8EFE99] text-gray-950 py-2 px-4 rounded shadow-lg opacity-0 transition-opacity duration-500 ease-in-out';
+      'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-[#8EFE99] text-gray-950 py-2 px-4 rounded shadow-lg opacity-0 transition-opacity duration-500 ease-in-out text-sm md:text-base';
     document.body.appendChild(confirmation);
     void confirmation.offsetWidth;
     confirmation.classList.add('opacity-100');
