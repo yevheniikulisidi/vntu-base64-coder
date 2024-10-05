@@ -1,8 +1,20 @@
+// Клас для кодування та декодування тексту в формат Base64
 class Base64Coder {
+  /**
+   * Кодує текст в формат Base64
+   * @param {string} text - текст для кодування
+   * @returns {string} - закодований текст
+   */
   encode(text) {
     return btoa(encodeURIComponent(text));
   }
 
+  /**
+   * Декодує текст з формату Base64
+   * @param {string} base64 - закодований текст
+   * @returns {string} - декодований текст
+   * @returns {null} - якщо текст не може бути декодований
+   */
   decode(base64) {
     try {
       return decodeURIComponent(atob(base64));
@@ -11,12 +23,22 @@ class Base64Coder {
     }
   }
 
+  /**
+   * Кодує або декодує текст в залежності від дії
+   * @param {string} action - дія (encode або decode)
+   * @param {string} text - текст для кодування або декодування
+   * @returns {string} - закодований або декодований текст
+   */
   process(action, text) {
     return action === 'encode' ? this.encode(text) : this.decode(text);
   }
 }
 
+// Клас для ініціалізації програми та обробки подій
 class App {
+  /**
+   * @param {Base64Coder} coder - екземпляр класу Base64Coder
+   */
   constructor(coder) {
     this.coder = coder;
     this.inputTextElement = document.getElementById('inputText');
@@ -26,6 +48,10 @@ class App {
     this.init();
   }
 
+  /**
+   * Ініціалізує програму та додає обробники подій
+   * @returns {void}
+   */
   init() {
     document
       .getElementById('encodeButton')
@@ -44,6 +70,11 @@ class App {
     );
   }
 
+  /**
+   * Оновлює вихідний текст в залежності від дії
+   * @param {string} action - дія (encode або decode)
+   * @returns {void}
+   */
   updateOutput(action) {
     const inputText = this.inputTextElement.value;
     const result = this.coder.process(action, inputText);
@@ -58,16 +89,28 @@ class App {
     this.updateCharCount();
   }
 
+  /**
+   * Оновлює лічильник символів в текстовому полі
+   * @returns {void}
+   */
   updateCharCount() {
     this.inputCharCountElement.textContent = `${this.inputTextElement.value.length} символів`;
   }
 
+  /**
+   * Очищує текстові поля та оновлює лічильник символів
+   * @returns {void}
+   */
   clearText() {
     this.inputTextElement.value = '';
     this.outputTextElement.value = '';
     this.updateCharCount();
   }
 
+  /**
+   * Копіює результат в буфер обміну
+   * @returns {void}
+   */
   async copyToClipboard() {
     if (this.outputTextElement.value) {
       try {
@@ -83,6 +126,11 @@ class App {
     }
   }
 
+  /**
+   * Альтернативний метод копіювання тексту в буфер обміну
+   * @param {string} text - текст для копіювання
+   * @returns {void}
+   */
   fallbackCopyTextToClipboard(text) {
     const textArea = document.createElement('textarea');
     textArea.value = text;
@@ -99,6 +147,16 @@ class App {
     document.body.removeChild(textArea);
   }
 
+  /**
+   * Показує повідомлення на екрані
+   * @param {string} message - текст повідомлення
+   * @param {string} type - тип повідомлення (success або error)
+   * @returns {void}
+   * @example
+   * showMessage('Текст повідомлення', 'success');
+   * showMessage('Текст помилки', 'error');
+   * @see showMessage
+   */
   showMessage(message, type) {
     const div = document.createElement('div');
     div.textContent = message;
